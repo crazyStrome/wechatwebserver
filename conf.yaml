@@ -1,0 +1,9 @@
+appid: appid
+secret: secret
+addr: ':80'
+token: token
+access_token:
+  duration_in_sec: 7000
+  timeout_in_sec: 5
+  retries: 3
+  url: https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&
