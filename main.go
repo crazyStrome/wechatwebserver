@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	initLogrus()
 	ctx := context.Background()
 	if err := config.InitConf(ctx, "conf.yaml"); err != nil {
 		logrus.Fatal(err)
@@ -28,5 +29,10 @@ func main() {
 func initLogrus() {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetReportCaller(true)
-	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetFormatter(&logrus.TextFormatter{
+		ForceColors:     true,
+		ForceQuote:      true,
+		TimestampFormat: "2006-01-02 15:04:05.000",
+		FullTimestamp:   true,
+	})
 }
