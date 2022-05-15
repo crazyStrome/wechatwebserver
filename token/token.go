@@ -10,20 +10,22 @@ import (
 	"sync/atomic"
 	"time"
 	"wechatwebserver/config"
+
+	"github.com/sirupsen/logrus"
 )
 
 var global atomic.Value
 
 // InitAccess 初始化并更新 accesstoken
 func InitAccess(ctx context.Context) error {
-	log.Printf("start init accesstoken\n")
+	logrus.Infof("start init accesstoken")
 	token, err := getToken(ctx)
 	if err != nil {
 		return err
 	}
 	global.Store(token)
 	go updateToken(ctx)
-	log.Printf("end init accesstoken:%v\n", GetToken())
+	logrus.Infof("end init accesstoken:%v", GetToken())
 	return nil
 }
 
@@ -56,7 +58,7 @@ func getToken(ctx context.Context) (string, error) {
 	if err := json.Unmarshal(body, token); err != nil {
 		return "", fmt.Errorf("unmarshal token err:%v, body:%s", err, body)
 	}
-	log.Printf("access_token is:%+v\n", token)
+	logrus.Infof("access_token is:%+v", token)
 	if token.ErrCode != 0 {
 		return "", fmt.Errorf("token.code:%v, msg:%v", token.ErrCode, token.ErrMsg)
 	}
@@ -70,16 +72,16 @@ func updateToken(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("updateToken ctx done\n")
+			logrus.Infof("updateToken ctx done")
 		case <-tick.C:
 			for i := 0; i < int(conf.AccessToken.Retries); i++ {
 				token, err := getToken(ctx)
 				if err != nil {
-					log.Printf("ERROR updateToken get err:%v\n", err)
+					logrus.Errorf("updateToken get err:%v", err)
 					continue
 				}
 				global.Store(token)
-				log.Printf("updateToken get new token:%v\n", GetToken())
+				logrus.Infof("updateToken get new token:%v", GetToken())
 				break
 			}
 		}

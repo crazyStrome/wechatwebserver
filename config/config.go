@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"reflect"
 	"sync/atomic"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -32,14 +32,14 @@ type AccessToken struct {
 
 // InitConf 初始化配置, name 是配置文件名
 func InitConf(ctx context.Context, name string) error {
-	log.Printf("start init conf:%v\n", name)
+	logrus.Infof("start init conf:%v", name)
 	conf, err := getConf(name)
 	if err != nil {
 		return err
 	}
 	globalConf.Store(conf)
 	go updateConf(ctx, name)
-	log.Printf("end init confname:%v, conf:%+v\n", name, GetConf())
+	logrus.Infof("end init confname:%v, conf:%+v", name, GetConf())
 	return nil
 }
 
@@ -56,20 +56,20 @@ func getConf(name string) (*Conf, error) {
 }
 
 func updateConf(ctx context.Context, name string) {
-	log.Printf("start updateConf:%v\n", name)
+	logrus.Infof("start updateConf:%v", name)
 	tick := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("updateConf ctx done")
+			logrus.Infof("updateConf ctx done")
 		case <-tick.C:
 			conf, err := getConf(name)
 			if err != nil {
-				log.Printf("ERROR get conf err:%v, name:%v\n", err, name)
+				logrus.Errorf("get conf err:%v, name:%v\n", err, name)
 				continue
 			}
 			if !reflect.DeepEqual(conf, GetConf()) {
-				log.Printf("get new conf:%+v\n", conf)
+				logrus.Infof("get new conf:%+v\n", conf)
 			}
 			globalConf.Store(conf)
 		}
