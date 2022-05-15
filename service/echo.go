@@ -10,10 +10,10 @@ import (
 )
 
 func echo(c *gin.Context) {
-	logrus.Debugf("echo req:%+v", c.Request)
+	logrus.Infof("echo req:%+v", c.Request)
 	start := time.Now()
 	defer func() {
-		logrus.Debugf("echo done, req:%v, cost:%v", c.Request, time.Since(start))
+		logrus.Infof("echo done, req:%v, cost:%v", c.Request, time.Since(start))
 	}()
 	echostr := c.Query("echostr")
 	c.String(http.StatusOK, echostr)

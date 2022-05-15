@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
@@ -41,18 +40,11 @@ type Msg struct {
 	Label      CDATA   `xml:"Label"`
 }
 
-func msg(w http.ResponseWriter, r *http.Request) {
-	var content, _ = ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-
-	log.Println(content)
-	w.Write([]byte("crazstom"))
-}
 func procMsg(c *gin.Context) {
-	logrus.Debugf("procMsg req:%v", c.Request)
+	logrus.Infof("procMsg req:%v", c.Request)
 	start := time.Now()
 	defer func() {
-		logrus.Debugf("procMsg done, req:%v, cost:%v", c.Request, time.Since(start))
+		logrus.Infof("procMsg done, req:%v, cost:%v", c.Request, time.Since(start))
 	}()
 	if err := handleMsg(c); err != nil {
 		logrus.Errorf("handleMsg err:%v", err)
