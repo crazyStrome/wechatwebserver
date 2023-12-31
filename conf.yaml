@@ -11,3 +11,7 @@ access_token:
 open_ai_config:
   url: http://xxx
   token: token
+open_ai_cache:
+  expire_time: 10
+  clean_time: 20
+  cache_len: 256

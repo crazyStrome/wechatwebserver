@@ -22,6 +22,13 @@ type Conf struct {
 	AccessToken  AccessToken  `yaml:"access_token"`
 	Token        string       `yaml:"token"` // 配置服务器使用的 token
 	OpenAIConfig OpenAIConfig `yaml:"open_ai_config"`
+	OpenAICache  CacheConfig  `yaml:"open_ai_cache"`
+}
+
+type CacheConfig struct {
+	ExpireTime int32 `yaml:"expire_time"` // 过期时间
+	CleanTime  int32 `yaml:"clean_time"`  // 清理时间
+	CacheLen   int32 `yaml:"cache_len"`   // 缓存的值的长度阈值，超过这个长度不缓存
 }
 
 type OpenAIConfig struct {
