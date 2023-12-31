@@ -53,11 +53,11 @@ func Talk(ctx context.Context, reqMsg string) (string, error) {
 				},
 			},
 		})
-		logrus.Infof("Talk:%v cost:%v, err:%v", reqMsg, time.Since(now), err)
 		if err != nil {
-			logrus.Errorf("Talk:%v err:%v", reqMsg, err)
+			logrus.Errorf("Talk:%v err:%v, cost:%v", reqMsg, err, time.Since(now))
 			return
 		}
+		logrus.Infof("Talk:%v cost:%v, rsp:%v", reqMsg, time.Since(now), rsp.Choices[0].Message.Content)
 		ch <- rsp.Choices[0].Message.Content
 	}()
 	select {
