@@ -25,7 +25,7 @@ func TestUnmarshalMsg(t *testing.T) {
   <Label><![CDATA[位置信息]]></Label>
 </xml>
 `
-	msg := &service.Msg{}
+	msg := &service.Request{}
 	if err := xml.Unmarshal([]byte(msgStr), msg); err != nil {
 		t.Error(err)
 	}

@@ -45,7 +45,6 @@ func InitConf(ctx context.Context, name string) error {
 	}
 	globalConf.Store(conf)
 	go updateConf(ctx, name)
-	logrus.Infof("end init confname:%v, conf:%+v", name, GetConf())
 	return nil
 }
 

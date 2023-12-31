@@ -74,7 +74,7 @@ func toJSON(val interface{}) string {
 
 func procMsg(c *gin.Context) {
 	if msg, err := handleMsg(c); err != nil {
-		logrus.Errorf("handleMsg err:%v, req:%v", err, toJSON(c))
+		logrus.Errorf("handleMsg err:%v, req:%+v", err, c)
 	} else {
 		c.String(http.StatusOK, msg)
 	}
@@ -92,10 +92,10 @@ func handleMsg(c *gin.Context) (string, error) {
 	if msg.MsgType.Test == "text" {
 		rsp, err := handleText(c.Request.Context(), msg)
 		if err != nil {
+            logrus.Errorf("handleMsg:%s err:%v", body, err)
 			return "", err
 		}
         data, _ := xml.Marshal(rsp)
-        logrus.Infof("handleText done, req:%v, rsp:%v", toJSON(msg), toJSON(rsp))
         return string(data), nil
 	}
 	return "", nil
