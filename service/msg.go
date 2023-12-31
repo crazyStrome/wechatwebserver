@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 	"wechatwebserver/client"
 
 	"github.com/gin-gonic/gin"
@@ -90,9 +91,10 @@ func handleMsg(c *gin.Context) (string, error) {
 		return "", fmt.Errorf("unmarshal err:%v, body:%s", err, body)
 	}
 	if msg.MsgType.Test == "text" {
+        now := time.Now()
 		rsp, err := handleText(c.Request.Context(), msg)
 		if err != nil {
-            logrus.Errorf("handleMsg:%s err:%v", body, err)
+            logrus.Errorf("handleMsg:%s err:%v, cost:%v", body, err, time.Since(now))
 			return "", err
 		}
         data, _ := xml.Marshal(rsp)
