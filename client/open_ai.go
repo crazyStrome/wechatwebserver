@@ -44,7 +44,7 @@ func Talk(ctx context.Context, reqMsg string) (string, error) {
 	ch := make(chan string)
 	now := time.Now()
 	go func() {
-		rsp, err := openAICli.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
+		rsp, err := openAICli.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
