@@ -76,8 +76,7 @@ func procMsg(c *gin.Context) {
 	if msg, err := handleMsg(c); err != nil {
 		logrus.Errorf("handleMsg err:%v, req:%v", err, toJSON(c))
 	} else {
-		data, _ := xml.Marshal(msg)
-		c.String(http.StatusOK, string(data))
+		c.String(http.StatusOK, msg)
 	}
 }
 
