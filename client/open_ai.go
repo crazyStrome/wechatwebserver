@@ -40,6 +40,8 @@ func Test(ctx context.Context) {
 }
 
 func Talk(ctx context.Context, reqMsg string) (string, error) {
+    ddl, ok := ctx.Deadline()
+    logrus.Infof("Talk ddl:%v, ok:%v", ddl, ok)
     rsp, err := openAICli.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
         Model: openai.GPT3Dot5Turbo,
         Messages: []openai.ChatCompletionMessage{
