@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -17,8 +18,8 @@ type CDATA struct {
 	Test string `xml:",cdata"`
 }
 
-// Msg 微信发过来的消息格式
-type Msg struct {
+// Request 信发过来的消息格式
+type Request struct {
 	XMLName      xml.Name `xml:"xml"`
 	FromUserName CDATA    `xml:"FromUserName"`
 	ToUserName   CDATA    `xml:"ToUserName"`
@@ -72,41 +73,49 @@ func toJSON(val interface{}) string {
 }
 
 func procMsg(c *gin.Context) {
-	logrus.Infof("procMsg:%v", toJSON(c))
 	if msg, err := handleMsg(c); err != nil {
 		logrus.Errorf("handleMsg err:%v, req:%v", err, toJSON(c))
 	} else {
 		data, _ := xml.Marshal(msg)
-        logrus.Infof("procMsg rsp:%s", data)
 		c.String(http.StatusOK, string(data))
 	}
 }
 
-func handleMsg(c *gin.Context) (*Response, error) {
+func handleMsg(c *gin.Context) (string, error) {
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		return nil, fmt.Errorf("read body err:%v", err)
+		return "", fmt.Errorf("read body err:%v", err)
 	}
-	msg := &Msg{}
+	msg := &Request{}
 	if err := xml.Unmarshal(body, msg); err != nil {
-		return nil, fmt.Errorf("unmarshal err:%v, body:%s", err, body)
+		return "", fmt.Errorf("unmarshal err:%v, body:%s", err, body)
 	}
 	if msg.MsgType.Test == "text" {
-		rsp, err := client.Talk(c.Request.Context(), msg.Content.Test)
+		rsp, err := handleText(c.Request.Context(), msg)
 		if err != nil {
-			return nil, fmt.Errorf("Talk:%v err:%v", msg.Content.Test, err)
+			return "", err
 		}
-		return &Response{
-			FromUserName: msg.ToUserName,
-			ToUserName:   msg.FromUserName,
-			MsgType: CDATA{
-				Test: "text",
-			},
-			Content: CDATA{
-				Test: rsp,
-			},
-            MsgId: msg.MsgId,
-		}, nil
+        data, _ := xml.Marshal(rsp)
+        logrus.Infof("handleText done, req:%v, rsp:%v", toJSON(msg), toJSON(rsp))
+        return string(data), nil
 	}
-	return nil, nil
+	return "", nil
+}
+
+func handleText(ctx context.Context, req *Request) (*Response, error) {
+	rsp, err := client.Talk(ctx, req.Content.Test)
+	if err != nil {
+		return nil, fmt.Errorf("Talk:%v err:%v", req.Content.Test, err)
+	}
+	return &Response{
+		FromUserName: req.ToUserName,
+		ToUserName:   req.FromUserName,
+		MsgType: CDATA{
+			Test: "text",
+		},
+		Content: CDATA{
+			Test: rsp,
+		},
+		MsgId: req.MsgId,
+	}, nil
 }
