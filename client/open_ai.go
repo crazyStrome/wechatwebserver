@@ -41,6 +41,8 @@ func Test(ctx context.Context) {
 }
 
 func Talk(ctx context.Context, reqMsg string) (string, error) {
+    ctx, cancel := context.WithTimeout(ctx, 4 * time.Second)
+    defer cancel()
 	ch := make(chan string)
 	now := time.Now()
 	go func() {
