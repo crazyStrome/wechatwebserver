@@ -41,8 +41,8 @@ func Test(ctx context.Context) {
 }
 
 func Talk(ctx context.Context, reqMsg string) (string, error) {
-    ctx, cancel := context.WithTimeout(ctx, 4 * time.Second)
-    defer cancel()
+	ctx, cancel := context.WithTimeout(ctx, 4*time.Second)
+	defer cancel()
 	ch := make(chan string)
 	now := time.Now()
 	go func() {
@@ -59,7 +59,9 @@ func Talk(ctx context.Context, reqMsg string) (string, error) {
 			logrus.Errorf("Talk:%v err:%v, cost:%v", reqMsg, err, time.Since(now))
 			return
 		}
-		logrus.Infof("Talk:%v cost:%v, rsp:%v", reqMsg, time.Since(now), rsp.Choices[0].Message.Content)
+		if time.Since(now).Seconds() > 4.0 {
+			logrus.Infof("Talk:%v cost:%v, rsp:%v", reqMsg, time.Since(now), rsp.Choices[0].Message.Content)
+		}
 		ch <- rsp.Choices[0].Message.Content
 	}()
 	select {
