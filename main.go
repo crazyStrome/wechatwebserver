@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"wechatwebserver/client"
 	"wechatwebserver/config"
 	"wechatwebserver/service"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 )
+
 
 func main() {
 	initLogrus()
@@ -33,8 +35,19 @@ func main() {
 
 }
 
+var logLevel string
+
 func initLogrus() {
-	logrus.SetLevel(logrus.DebugLevel)
+    flag.StringVar(&logLevel, "log_level", "debug", "default is debug,other is info error")
+    flag.Parse()
+
+	if logLevel == "info" {
+		logrus.SetLevel(logrus.InfoLevel)
+	} else if logLevel == "error" {
+		logrus.SetLevel(logrus.ErrorLevel)
+    } else {
+        logrus.SetLevel(logrus.DebugLevel)
+    }
 	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,

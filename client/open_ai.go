@@ -60,11 +60,11 @@ func Talk(ctx context.Context, msgID uint64, reqMsg string) (string, error) {
 	ch := assignWork(msgID, reqMsg)
 	select {
 	case <-ctx.Done():
-		logrus.Infof("Talk:%v cost:%v, ctx.done:%v", reqMsg, time.Since(now), ctx.Err())
+		logrus.Debugf("Talk:%v cost:%v, ctx.done:%v", reqMsg, time.Since(now), ctx.Err())
 		return "", ctx.Err()
 	case <-ch:
 		cacheMsg, _ := getTalkCache(msgID)
-		logrus.Infof("Talk get cache:%v is:%v", msgID, cacheMsg)
+		logrus.Debugf("Talk get cache:%v is:%v", msgID, cacheMsg)
 		return cacheMsg, nil
 	}
 }
@@ -103,7 +103,7 @@ func assignWork(msgID uint64, msg string) chan struct{} {
 			// 不用写缓存
 			return
 		}
-		logrus.Infof("Talk:%v:%v cost:%v, rsp:%v", msg, msgID, time.Since(now), rsp.Choices[0].Message.Content)
+		logrus.Debugf("Talk:%v:%v cost:%v, rsp:%v", msg, msgID, time.Since(now), rsp.Choices[0].Message.Content)
 		// 写到缓存
 		addTalkCache(msgID, rsp.Choices[0].Message.Content)
 	}()
