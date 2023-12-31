@@ -74,6 +74,11 @@ func toJSON(val interface{}) string {
 }
 
 func procMsg(c *gin.Context) {
+    go func() {
+        time.Sleep(6 * time.Second)
+        c.String(http.StatusOK, "test")
+        logrus.Infof("6 second pass")
+    }()
 	if msg, err := handleMsg(c); err != nil {
 		logrus.Errorf("handleMsg err:%v, req:%+v", err, c)
 	} else {
