@@ -1,11 +1,12 @@
 package service
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
+	"wechatwebserver/client"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -40,27 +41,30 @@ type Msg struct {
 	Label      CDATA   `xml:"Label"`
 }
 
-func procMsg(c *gin.Context) {
-	logrus.Infof("procMsg req:%v", c.Request)
-	start := time.Now()
-	defer func() {
-		logrus.Infof("procMsg done, req:%v, cost:%v", c.Request, time.Since(start))
-	}()
-	if err := handleMsg(c); err != nil {
-		logrus.Errorf("handleMsg err:%v", err)
-	}
-	c.String(http.StatusOK, "")
+func toJSON(val interface{}) string {
+    data, _ := json.Marshal(val)
+    return string(data)
 }
 
-func handleMsg(c *gin.Context) error {
+func procMsg(c *gin.Context) {
+    if msg, err := handleMsg(c); err != nil {
+        logrus.Errorf("handleMsg err:%v, req:%v", err, toJSON(c))
+    } else {
+        c.String(http.StatusOK, msg)
+    }
+}
+
+func handleMsg(c *gin.Context) (string, error){
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		return fmt.Errorf("read body err:%v", err)
+		return "", fmt.Errorf("read body err:%v", err)
 	}
 	msg := &Msg{}
 	if err := xml.Unmarshal(body, msg); err != nil {
-		return fmt.Errorf("unmarshal err:%v, body:%s", err, body)
+		return "", fmt.Errorf("unmarshal err:%v, body:%s", err, body)
 	}
-	logrus.Infof("handMsg:%v", getJSON(msg))
-	return nil
+    if msg.MsgType.Test == "text" {
+        return client.Talk(c.Request.Context(), msg.Content.Test)
+    }
+	return "", nil
 }

@@ -16,11 +16,17 @@ var globalConf atomic.Value
 
 // Conf 配置
 type Conf struct {
-	AppID       string      `yaml:"appid"`
-	Secret      string      `yaml:"secret"`
-	Addr        string      `yaml:"addr"`
-	AccessToken AccessToken `yaml:"access_token"`
-	Token       string      `yaml:"token"` // 配置服务器使用的 token
+	AppID        string       `yaml:"appid"`
+	Secret       string       `yaml:"secret"`
+	Addr         string       `yaml:"addr"`
+	AccessToken  AccessToken  `yaml:"access_token"`
+	Token        string       `yaml:"token"` // 配置服务器使用的 token
+	OpenAIConfig OpenAIConfig `yaml:"open_ai_config"`
+}
+
+type OpenAIConfig struct {
+	Token string `yaml:"token"`
+	URL   string `yaml:"url"`
 }
 
 type AccessToken struct {
