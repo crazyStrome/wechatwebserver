@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"wechatwebserver/client"
 	"wechatwebserver/config"
 	"wechatwebserver/service"
 	"wechatwebserver/token"
@@ -20,10 +21,16 @@ func main() {
 		logrus.Fatal(err)
 		return
 	}
+	if err := client.Init(); err != nil {
+		logrus.Fatal(err)
+		return
+	}
+	client.Test(ctx)
 	if err := service.InitServer(ctx); err != nil {
 		logrus.Fatal(err)
 		return
 	}
+
 }
 
 func initLogrus() {
